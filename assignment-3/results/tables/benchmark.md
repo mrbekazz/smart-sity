@@ -1,0 +1,20 @@
+| Algorithm | Graph | V | E | Average time (ns) | Edge scans | Sort comparisons | DSU finds | DSU unions | PQ pushes | PQ pops | Components / reachable | Success |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|:---:|
+|Kruskal|Undirected-connected|10|30|46151|11|110|22|11|0|0|1|true|
+|Prim|Undirected-connected|10|30|159175|60|0|0|0|30|30|1|true|
+|SCC|Directed-with-cycle|10|30|88856|90|0|0|0|0|0|1|true|
+|Topological-DAG|Directed-DAG|10|30|38696|60|0|0|0|0|0|0|true|
+|Topological-Cyclic|Directed-with-cycle|10|30|4919|30|0|0|0|0|0|0|true|
+|Dijkstra|Directed-nonnegative|10|30|46045|60|0|0|0|12|12|10|true|
+|Kruskal|Undirected-connected|100|500|458784|243|3841|486|243|0|0|1|true|
+|Prim|Undirected-connected|100|500|471258|1000|0|0|0|500|500|1|true|
+|SCC|Directed-with-cycle|100|500|294649|1500|0|0|0|0|0|3|true|
+|Topological-DAG|Directed-DAG|100|500|189211|1000|0|0|0|0|0|0|true|
+|Topological-Cyclic|Directed-with-cycle|100|500|30151|500|0|0|0|0|0|0|true|
+|Dijkstra|Directed-nonnegative|100|500|245391|1000|0|0|0|153|153|100|true|
+|Kruskal|Undirected-connected|1000|5000|2953618|3094|55214|6188|3094|0|0|1|true|
+|Prim|Undirected-connected|1000|5000|5574853|10000|0|0|0|5000|5000|1|true|
+|SCC|Directed-with-cycle|1000|5000|1102621|15000|0|0|0|0|0|14|true|
+|Topological-DAG|Directed-DAG|1000|5000|915620|10000|0|0|0|0|0|0|true|
+|Topological-Cyclic|Directed-with-cycle|1000|5000|122804|5038|0|0|0|0|0|0|true|
+|Dijkstra|Directed-nonnegative|1000|5000|3937521|9962|0|0|0|1432|1432|993|true|

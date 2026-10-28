@@ -1,0 +1,46 @@
+PASS: DSU initial components
+PASS: DSU first union
+PASS: DSU second union
+PASS: DSU repeated union
+PASS: DSU find representative
+PASS: DSU component count
+PASS: DSU operation counters
+PASS: Kruskal MST weight
+PASS: Prim MST weight
+PASS: Kruskal and Prim match
+PASS: MST edge count
+PASS: MST connected status
+PASS: Kruskal detects disconnected graph
+PASS: Prim detects disconnected graph
+PASS: Disconnected components count
+PASS: Minimum spanning forest weight
+PASS: Single-vertex Kruskal
+PASS: Single-vertex Prim
+PASS: Single-vertex topology
+PASS: Single-vertex SCC
+PASS: Single-vertex Dijkstra
+PASS: DAG accepted
+PASS: DAG order respects every edge
+PASS: Cycle rejected by topological ordering
+PASS: Kosaraju SCC groups
+PASS: Every vertex in exactly one SCC
+PASS: Dijkstra distances
+PASS: Dijkstra path reconstruction
+PASS: Unreachable vertex handling
+PASS: Dijkstra rejects negative weights
+PASS: Generated graph size 10
+PASS: Fixed-seed reproducibility 10
+PASS: Generated graph connected 10
+PASS: Generated DAG 10
+PASS: Generated directed cycle 10
+PASS: Generated graph size 100
+PASS: Fixed-seed reproducibility 100
+PASS: Generated graph connected 100
+PASS: Generated DAG 100
+PASS: Generated directed cycle 100
+PASS: Generated graph size 1000
+PASS: Fixed-seed reproducibility 1000
+PASS: Generated graph connected 1000
+PASS: Generated DAG 1000
+PASS: Generated directed cycle 1000
+Tests passed: 45/45
