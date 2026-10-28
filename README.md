@@ -1,119 +1,164 @@
 Smart City Infrastructure and Route Planning
+Assignment 3 · Graph Algorithms · Java
+
+A graph-based study of city infrastructure: building a low-cost road network, analysing directed connectivity, detecting cycles, and finding shortest routes.
+
+Table of Contents
+- 1. Overview
+- 2. Problem Statement
+- 3. Implementation
+- 4. Complexity Analysis
+- 5. Experimental Setup
+- 6. Results
+- 7. Comparison and Discussion
+- 8. Testing
+- 9. Conclusion
+- 10. How to Run
 1. Overview
-This project represents a city as a weighted graph. Vertices stand for districts, and edges represent roads or other connections. The weight of an edge can represent distance or construction cost.
+This project models a city as a weighted graph. Vertices represent districts or locations, while edges represent roads or other connections. Edge weights can represent distance, cost, or another non-negative measure.
 
-The program includes algorithms for building a low-cost network, checking directed connections, and finding shortest paths. It is written in Java and can be run from the command line.
+The goal is to implement and evaluate core graph algorithms that can support infrastructure planning and route analysis. The project includes Disjoint Set Union (DSU), Kruskal's and Prim's minimum spanning tree algorithms, topological ordering with cycle detection, strongly connected components (SCC), and Dijkstra's shortest-path algorithm.
 
-2. Implementation
-The graph is stored as an adjacency list. Each vertex has a list of its outgoing or neighbouring edges, and the graph also stores its edge list for the MST algorithms. Vertices are numbered from 0 to V - 1.
+Technology: Java, standard library only. No external libraries are required.
+2. Problem Statement
+A smart-city planning system needs to answer several different questions:
+1. Network construction: How can all districts be connected with the lowest total connection cost?
+2. Connectivity: Which locations belong to the same strongly connected group in a directed network?
+3. Dependency/order analysis: Is a directed network acyclic, and if so, what valid topological order can be used?
+4. Route planning: What is the shortest route from a selected source to each reachable location?
+5. Scalability: How does the execution time of these algorithms change as graph size increases?
+The implementation addresses these questions using standard graph representations and algorithmic techniques. The benchmark compares results on small, medium, and large generated graphs.
+3. Implementation
+The graph is represented with an adjacency list. The implementation also keeps an edge list for algorithms that need to process all edges. Vertices are numbered from 0 to V - 1.
+Algorithms
+Component	Approach	Purpose
+DSU	Path compression + union by size	Maintains disjoint sets efficiently and tracks connected components.
+Kruskal	Sort edges by weight + DSU	Builds a minimum spanning tree (MST) or minimum spanning forest.
+Prim	Priority queue	Expands a minimum spanning tree by repeatedly selecting a low-weight candidate edge.
+Topological ordering	Kahn's algorithm	Produces a valid order for a directed acyclic graph (DAG) and detects cycles.
+SCC	Kosaraju's algorithm	Finds strongly connected components in a directed graph.
+Dijkstra	Priority queue	Calculates shortest paths from a source when all edge weights are non-negative.
 
-The source files are organised as follows:
 
-src/
-├── graph/Graph.java
-├── dsu/DSU.java
-├── mst/MST.java
-├── connectivity/Conn.java
-├── shortestpath/SP.java
-├── app/Main.java
-├── app/Bench.java
-└── test/Test.java
-The main algorithms are:
+Project structure
+assignment-3/
+├── src/
+│   ├── app/
+│   │   ├── Main.java       # Demonstration program
+│   │   └── Bench.java      # Benchmark generation and measurements
+│   ├── connectivity/
+│   │   └── Conn.java       # Topological ordering and SCC
+│   ├── dsu/
+│   │   └── DSU.java        # Disjoint Set Union
+│   ├── graph/
+│   │   └── Graph.java      # Graph and edge representation
+│   ├── mst/
+│   │   └── MST.java        # Kruskal and Prim
+│   ├── shortestpath/
+│   │   └── SP.java         # Dijkstra shortest paths
+│   └── test/
+│       └── Test.java       # Correctness and edge-case tests
+├── results/
+│   ├── plots/              # SVG benchmark plots
+│   ├── tables/             # CSV and Markdown benchmark results
+│   └── test-results.txt
+├── run.bat                 # Windows runner
+├── run.sh                  # Linux/macOS runner
+└── README.md                # Report and analysis
+Important implementation details
+- DSU uses path compression in find and union by size in union.
+- Kruskal sorts edges by weight and uses DSU to avoid adding edges that create cycles.
+- Prim uses a priority queue to choose candidate edges. Both MST algorithms are evaluated on connected, undirected graphs.
+- Topological ordering returns an order only when all vertices can be processed. If a directed cycle exists, the result indicates that a valid topological order is not possible.
+- Kosaraju's algorithm performs DFS passes on the graph and its reverse to identify SCCs.
+- Dijkstra returns distances and reconstructed paths for reachable vertices. Unreachable vertices are marked accordingly. Negative edge weights are rejected because Dijkstra does not support them.
+4. Complexity Analysis
+Let V be the number of vertices and E the number of edges. The graph is stored as an adjacency list. The priority queues used by Prim and Dijkstra are Java PriorityQueue binary heaps.
+Algorithm	Time complexity	Auxiliary/overall space	Explanation
+DSU find / union	Amortized O(α(V)) per operation	O(V) for DSU	Path compression and union by size keep the set trees shallow. α(V) is the inverse Ackermann function.
+Kruskal	O(E log E + E α(V))	O(V + E)	Sorting the edges is the dominant step; DSU operations are nearly constant amortized time.
+Prim	O((V + E) log V) for a simple graph	O(V + E)	Priority-queue operations determine the logarithmic factor.
+Kosaraju SCC	O(V + E)	O(V + E)	Each vertex and edge is processed a constant number of times, including construction of the reverse graph.
+Topological ordering	O(V + E)	O(V) auxiliary, excluding graph storage	Computes indegrees and processes vertices and outgoing edges.
+Dijkstra	O((V + E) log V) for a simple graph	O(V + E)	Uses a binary heap and assumes non-negative edge weights.
 
-DSU: find uses path compression, and union uses union by size.
-Kruskal: sorts the edges by weight and uses DSU to avoid adding a cycle to the spanning tree.
-Prim: uses a priority queue to choose the next low-weight edge.
-Topological ordering: uses Kahn's algorithm. If a cycle prevents all vertices from being ordered, the program reports that no valid order exists.
-SCC: uses Kosaraju's algorithm to find strongly connected components in a directed graph.
-Dijkstra: uses a priority queue to find shortest paths from a starting vertex. It reports the distance and path for each reachable vertex and does not accept negative edge weights.
-Main prints an example of the algorithms. Test checks the main expected results and edge cases. Bench creates graphs, measures the algorithms, and saves the results in the results directory.
 
-3. Complexity Analysis
-Here, V is the number of vertices and E is the number of edges. The graph uses an adjacency list. Prim and Dijkstra use Java's PriorityQueue, which is implemented with a binary heap.
-
-Algorithm	Time complexity	Space complexity	Notes
-DSU find	Amortized O(α(V))	O(V) for the DSU structure	Uses path compression and union by size.
-DSU union	Amortized O(α(V))	O(V) for the DSU structure	Calls find and joins the smaller set to the larger one.
-Kruskal	O(E log E + E α(V))	O(V + E)	Sorting the edges is the main cost.
-Prim	O((V + E) log V) for a simple graph	O(V + E)	The priority queue stores candidate edges.
-Kosaraju SCC	O(V + E)	O(V + E)	Uses the reversed directed graph and DFS passes.
-Topological ordering	O(V + E)	O(V) additional space	Each vertex and edge is processed a constant number of times.
-Dijkstra	O((V + E) log V) for a simple graph	O(V + E)	Assumes non-negative weights and a binary-heap priority queue.
-The number of vertices and edges affects each algorithm differently. Kruskal has to sort the edges. Prim and Dijkstra manage a priority queue. SCC and topological ordering are linear in V + E. The DSU optimisations keep its operations very efficient over a sequence of operations. Actual running time also depends on the computer and the Java runtime.
-
-4. Experimental Setup
-The benchmark uses the three graph sizes required by the assignment.
-
-Graph size	Vertices (V)	Edges (E)
+These are asymptotic bounds, not predictions of exact runtime. Actual measurements are affected by graph structure, JVM warm-up, hardware, and other processes running on the system.
+5. Experimental Setup
+The benchmark uses the three graph sizes specified for the assignment:
+Dataset	Vertices (V)	Edges (E)
 Small	10	30
 Medium	100	500
 Large	1,000	5,000
-The random seed is fixed at 20261022, so the generated graphs can be reproduced with the same code and Java environment.
 
-MST graphs: The generator creates a spanning tree first, so the undirected graph is connected. It then adds edges until it reaches the requested edge count. The weights are between 1 and 100.
-Directed graphs for SCC and cycle detection: The generator first adds a directed cycle, then adds more edges. These graphs therefore contain a cycle.
-DAGs: Edges are only added from a lower-numbered vertex to a higher-numbered vertex. This prevents directed cycles.
-Each algorithm is run once as a warm-up and then five times for timing. The program uses System.nanoTime() and records the average of the five runs. Graph generation is outside the timed part. The benchmark also records operation counts, including edge scans, sorting comparisons, DSU calls, and priority-queue pushes and pops.
 
-The full results are in results/tables/benchmark.csv and results/tables/benchmark.md. The CSV file can be opened in a spreadsheet program.
+Reproducibility and measurement
+- Random seed: 20261022.
+- Repetitions: 5 timed runs per algorithm and graph configuration, after one warm-up run.
+- Timer: System.nanoTime().
+- Timing scope: Graph generation is outside the timed section.
+- Recorded measurements: Average elapsed time in nanoseconds and operation counters such as edge scans, sorting comparisons, DSU calls, and priority-queue pushes/pops.
+The benchmark creates graph types suited to each algorithm:
+- MST: Connected undirected graphs. A spanning tree is generated first, then additional edges are added. Edge weights range from 1 to 100.
+- SCC and cycle detection: Directed graphs containing a cycle, with additional edges.
+- Topological ordering: Directed acyclic graphs, generated by adding edges only from a lower-numbered vertex to a higher-numbered vertex.
+- Dijkstra: Directed graphs with non-negative edge weights.
+A fixed seed makes the generated inputs repeatable. However, execution times can still vary across machines and JVM runs. The results below are the measurements stored in this repository's benchmark output.
+6. Results
+The following table reports the recorded average execution time for each algorithm. All values are in nanoseconds (ns) and are based on five timed repetitions.
+Algorithm	Graph type	10 V / 30 E	100 V / 500 E	1,000 V / 5,000 E
+Kruskal	Connected, undirected	27,294	1,155,385	4,381,407
+Prim	Connected, undirected	99,959	756,488	7,404,272
+SCC (Kosaraju)	Directed, with cycle	377,181	1,012,190	1,585,876
+Topological ordering	Directed DAG	232,164	603,626	1,230,365
+Topological cycle detection	Directed, with cycle	7,650	17,997	303,108
+Dijkstra	Directed, non-negative weights	78,779	1,649,114	1,681,049
 
-5. Results
-The table below shows the average times from the current benchmark run. Times are in nanoseconds.
 
-Algorithm	Graph used	10 vertices, 30 edges	100 vertices, 500 edges	1,000 vertices, 5,000 edges
-Kruskal	Connected, undirected	46,151	458,784	2,953,618
-Prim	Connected, undirected	159,175	471,258	5,574,853
-SCC (Kosaraju)	Directed graph with a cycle	88,856	294,649	1,102,621
-Topological ordering	DAG	38,696	189,211	915,620
-Topological cycle detection	Directed graph with a cycle	4,919	30,151	122,804
-Dijkstra	Directed graph with non-negative weights	46,045	245,391	3,937,521
-Execution time vs. number of vertices
 Execution time vs. number of vertices
 
 Execution time vs. number of edges
-Execution time vs. number of edges
 
-The recorded times are from one run and will differ between computers. Run the benchmark again to get measurements for your own environment. Running it updates the CSV, Markdown table, and plots.
+Full measurement records, including operation counts, are available in [`benchmark.csv`](results/tables/benchmark.csv) and the formatted table in [`benchmark.md`](results/tables/benchmark.md).
+Reading the results
+- The MST algorithms show different timing patterns as the graph grows. In this run, Kruskal is faster than Prim on the largest graph, while Prim is faster on the medium graph.
+- SCC and topological ordering show increasing execution time as the graph size grows, which is consistent with their expected O(V + E) complexity.
+- The cycle-detection run is relatively quick on the smaller graphs because the algorithm can identify a cycle without producing a complete topological order. The exact time is implementation- and input-dependent.
+- Dijkstra's recorded time does not increase uniformly across all three measurements. This illustrates why benchmark timings should be interpreted cautiously rather than treated as a perfectly smooth growth curve.
+Limitation: In these configurations, the number of vertices and edges increases together. The plots therefore show how runtime changes across the selected graph sizes, but they do not isolate the independent effect of changing only V or only E. The timings are also machine-dependent and should not be treated as universal performance rankings.
+7. Comparison and Discussion
+Kruskal vs. Prim
+Both algorithms solve the minimum spanning tree problem for connected, weighted, undirected graphs. Kruskal globally sorts the edge list and uses DSU to reject cycle-forming edges. Prim grows a tree from a starting vertex using a priority queue. Their practical performance depends on graph density, data structures, and implementation details. The measurements in this report do not establish that one algorithm is always faster than the other.
+DSU optimisation
+Path compression reduces the depth of paths followed by find, while union by size attaches the smaller set to the larger one. Together, these techniques make repeated connectivity checks efficient and support Kruskal's cycle prevention.
+SCC and topological ordering
+Kosaraju identifies groups in which every vertex is reachable from every other vertex in the same component. Topological ordering is defined only for DAGs. The implementation returns a valid order for acyclic input and reports cycle detection when not all vertices can be processed.
+Dijkstra
+Dijkstra calculates shortest distances from one source and reconstructs paths for reachable vertices. It is appropriate for non-negative weights, but not for graphs with negative edge weights. The tests cover unreachable vertices and the rejection of negative weights.
 
-6. Comparison and Discussion
-Kruskal and Prim. Both algorithms returned the same MST weight for the connected undirected graphs. Kruskal was faster in this run, especially for the largest graph. This is an observation from these measurements, not a rule that Kruskal must always be faster. The algorithms use different ways to choose the next edge, so the graph and implementation can affect the result.
+Overall, the implementation and measured operation counts provide more information than elapsed time alone. Timing results can fluctuate, while operation counters help explain what work an algorithm performed on a particular generated input.
+8. Testing
+The included test program reports 45/45 checks passed. Test coverage includes:
+- DSU initial state, union operations, representative lookup, component count, and operation counters.
+- Kruskal and Prim MST weights and consistency.
+- Disconnected graphs, minimum spanning forests, a single-vertex graph, and cases with multiple valid minimum spanning trees or equal edge weights.
+- Valid topological ordering for a DAG and cycle detection for cyclic input.
+- SCC membership and assignment of every vertex to exactly one component.
+- Dijkstra distances, path reconstruction, unreachable vertices, and negative-weight rejection.
+- Required graph sizes, fixed-seed reproducibility, connected MST inputs, generated DAGs, and generated directed cycles.
+The captured output is stored in [`results/test-results.txt`](results/test-results.txt). Run the tests again after modifying the source code.
+9. Conclusion
+This project implements the main graph algorithms required for the smart-city infrastructure scenario. Kruskal and Prim provide minimum spanning tree approaches, DSU supports efficient connectivity checks, Kosaraju identifies strongly connected components, Kahn's algorithm handles topological ordering and cycle detection, and Dijkstra calculates shortest paths for non-negative edge weights.
 
-DSU. Path compression shortens the paths followed by find. Union by size keeps the trees from becoming unnecessarily tall. Both optimisations help Kruskal check whether the endpoints of an edge are already connected.
-
-SCC and topological ordering. SCC execution time increased as the graph got larger, which is consistent with the expected O(V + E) complexity. Topological ordering completed for the generated DAGs and detected cycles in the cyclic graphs. Cycle detection can finish before processing every vertex, because the remaining vertices still have incoming edges when a cycle exists.
-
-Dijkstra. The algorithm found shortest paths for reachable vertices and marked the remaining vertices as unreachable. It is suitable for non-negative edge weights; it is not suitable for negative edge weights because a distance that was already treated as final could later be reduced by a path containing a negative edge.
-
-In these configurations, the number of vertices and edges increases together. The plots show the requested comparisons, but they do not measure the separate effect of changing only V or only E.
-
-7. Testing
-The test program currently passes 45 of 45 checks. It covers:
-
-DSU operations and component count.
-Kruskal and Prim returning the same MST weight.
-Disconnected graphs, multiple valid MSTs, duplicate weights, and a single vertex.
-Valid topological ordering and cycle detection.
-SCC membership, with every vertex assigned to exactly one component.
-Dijkstra distances, reconstructed paths, unreachable vertices, and rejection of negative weights.
-Reproducible graph generation and the required graph sizes.
-The test output is saved in results/test-results.txt. Tests should be run again after any changes to the source code.
-
-8. Conclusion
-The project implements the graph algorithms required by the assignment and includes correctness tests and performance measurements. Kruskal and Prim find a minimum spanning tree for connected undirected graphs. Kosaraju finds strongly connected components, topological ordering works on DAGs, and Dijkstra finds shortest paths when edge weights are non-negative.
-
-The benchmark shows how execution time changes as the graphs grow. The results also show why it is useful to check both the output and the operation counts instead of comparing algorithms by timing alone.
-
-How to Run
-You need JDK 11 or newer.
-
-On Windows, open Command Prompt in the project folder and run:
-
+The benchmark demonstrates how runtime changes across three graph sizes and records operation counts for further comparison. The results are consistent with the general complexity expectations, while also showing that individual timing measurements can vary by algorithm, input, and environment. Correctness tests complement the performance measurements by checking normal cases and important edge cases.
+10. How to Run
+Install JDK 11 or newer and open a terminal in the project root.
+Windows
 run.bat
 run.bat test
 run.bat bench
-On Linux or macOS, run:
-
+Linux / macOS
 ./run.sh demo
 ./run.sh test
 ./run.sh bench
-The first command runs the example. The second runs the tests. The third runs the benchmark and regenerates the result tables and plots. No external Java libraries are required.
+The demo command runs example inputs, test runs the correctness checks, and bench regenerates the benchmark tables and plots. The project uses only the Java standard library.
